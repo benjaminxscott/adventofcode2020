@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # https://adventofcode.com/2020/day/2
 
@@ -18,16 +17,20 @@ In the above example, 2 passwords are valid. The middle password, cdefg, is not;
 How many passwords are valid according to their policies?
 '''
 
-with open ('day2input.txt') as fp:
-    lines = fp.read().splitlines()
-    num_valid = 0
+def main():
+    with open ('day2input.txt') as fp:
+        lines = fp.read().splitlines()
+        num_valid = 0
 
-    for line in lines:
-        policy, passwd = line.split(': ')
-        policy_def, policy_char = policy.split()
-        min_chars, max_chars = policy_def.split('-')
+        for line in lines:
+            policy, passwd = line.split(': ')
+            policy_def, policy_char = policy.split()
+            min_chars, max_chars = policy_def.split('-')
 
-        if passwd.count(policy_char) <= int(max_chars) and passwd.count(policy_char) >= int(min_chars):
-            num_valid +=1
+            if passwd.count(policy_char) <= int(max_chars) and passwd.count(policy_char) >= int(min_chars):
+                num_valid +=1
 
-    print (num_valid)
+        print (num_valid)
+
+if __name__ == '__main__':
+    main()

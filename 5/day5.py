@@ -19,8 +19,8 @@ F means to take the lower half, keeping rows 32 through 47.
 B means to take the upper half, keeping rows 40 through 47.
 B keeps rows 44 through 47.
 F keeps rows 44 through 45.
-
 The final F keeps the lower of the two, row 44.
+
 The last three characters will be either L or R; these specify exactly one of the 8 columns of seats on the plane
 (numbered 0 through 7). The same process as above proceeds again, this time with only three steps.
 L means to keep the lower half, while R means to keep the upper half.
@@ -42,35 +42,60 @@ BFFFBBFRRR: row 70, column 7, seat ID 567.
 FFFBBBFRRR: row 14, column 7, seat ID 119.
 BBFFBBFRLL: row 102, column 4, seat ID 820.
 As a sanity check, look through your list of boarding passes. What is the highest seat ID on a boarding pass?
+
+--
+Part 2:
+It's a completely full flight, so your seat should be the only missing boarding pass in your list. However, there's a catch: some of the seats at the very front and back of the plane don't exist on this aircraft, so they'll be missing from your list as well.
+
+Your seat wasn't at the very front or back, though; the seats with IDs +1 and -1 from yours will be in your list.
+
+What is the ID of your seat?
 '''
 
 import math
+from collections import Counter
+
+def parse_binary_map(in_string):
+    # zero-based indices
+    highest_value = 2 ** len(in_string) -1
+    lowest_value = 0
+    for i, char in enumerate(in_string):
+        if char in ('R', 'B'):
+            # move our "lowest possible row" up by half of the remaining rows
+            lowest_value += math.ceil((highest_value - lowest_value) / 2)
+        elif char in ('L', 'F'):
+            # move our "highest possible row" down by half of itself
+            highest_value -= math.ceil((highest_value  - lowest_value )/ 2)
+        else:
+            raise Exception
+        #print(f"char at {i} is:{char}, possible rows:{lowest_value} to {highest_value}")
+
+    return lowest_value
 
 def main():
     with open ('day5input.txt') as fp:
-        # TODO - grabbing zeroth for testing
-        lines = [fp.read().splitlines()[0]]
+        lines = fp.read().splitlines()
+        seats = Counter()
 
-        # zero-based indices
-        back_row = 127
-        right_col = 7
         highest_seat_id = 0
 
-        # split the first 8 digits of our input row
-        lines = ['FBFBBFFRLR']
         for line in lines:
-            print (line)
-            highest_row = back_row
-            lowest_row = 0
-            highest_col = right_col
-            lowest_col = 0
-            for i in range(math.ceil(math.log(back_row, 2))):
-                # we assume that input is sane, and is only "B(ack)" or "F(ront)"
-                if line[i] == "B":
-                    lowest_row = math.ceil(highest_row / 2)
-                else:
-                    highest_row = math.floor(highest_row / 2)
-                print(f"char at {i} is:{line[i]}, possible rows:{lowest_row} to {highest_row}")
+            row = parse_binary_map(line[:7])
+            col = parse_binary_map(line[7:])
+            seat_id = row * 8 + col
 
+            # keep track of which seats are taken
+            seats[seat_id] = 1
+            highest_seat_id = max(highest_seat_id, seat_id)
+
+        # find the seat ID that is not contiguous (e.g. we may have seats 0-100 not taken, seats 101 to 1000 taken, and seat 999 open)
+        # so we keep track of which seat IDs have been observed, and see if its 'neighbors' are taken (via pigeonhole principle this must be the only open seat)
+        open_seat = -1
+        for i in range (2**len(lines)):
+            if not seats[i] and seats[i-1] and seats[i+1]:
+                open_seat = i
+                break
+        print(f"open seat is: {open_seat}")
+        print(f"highest seatID is: {highest_seat_id}")
 if __name__ == '__main__':
     main()

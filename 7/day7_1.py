@@ -43,18 +43,13 @@ z => terminal   | 1 shiny gold bag contains 1 dark olive bag, 2 vibrant plum bag
 We don't care about parsing all the way to 'terminal', since the only thing that matters is if we can get to 'z' from input symbol
 '''
 
-def find_target(rule, target):
-    found = False
-    # if found or terminal, return back up the stack
-    if target in rule:
-        #print("found")
-        found = True
-    else:
-        print(f"checking {rule}")
-        for next_rule in RULES.get(rule):
-            found = find_target (next_rule, target)
+def find_target(target):
+    # iterative
+    for rule in RULES:
+        if target in RULES.get(rule):
+            BAG_HOLDERS.add(rule)
+            find_target(rule)
 
-    return found
 
 def main():
     with open ('day7input.txt') as fp:
@@ -81,16 +76,13 @@ def main():
         # 'other' implies terminal symbol
         RULES.update({'other':[]})
 
-        bag_holders = 0
+        global BAG_HOLDERS
+        BAG_HOLDERS = set()
         target_bag = 'shiny gold'
-        print(RULES)
-        for leftside, rightside in RULES.items():
-            print(f"evaluating: {leftside} => {rightside}")
-            for rule in rightside:
-                if find_target(rule, target_bag):
-                    bag_holders +=1
-                    break
+        #print(RULES)
+        find_target(target_bag)
 
-        print(f"outermost bags that can hold {target_bag}: {bag_holders}")
+        print(f"outermost bags that can hold {target_bag}: {len(BAG_HOLDERS)}")
+
 if __name__ == '__main__':
     main()

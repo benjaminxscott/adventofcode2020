@@ -40,7 +40,7 @@ def find_target(target):
 def main():
     with open ('day7input.txt') as fp:
         lines = fp.read().splitlines()
-        # symbols always have two adjectives, numbers don't matter
+        # symbols always have two adjectives, numbers do matter
         # we assume rules are unique and not infinitely recursive
         # e.g. 'shiny gold bags' contain 3 clear fuchsia bags, <symbol ...>.
         # A => B

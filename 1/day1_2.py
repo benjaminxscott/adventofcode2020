@@ -14,10 +14,12 @@ with open ('day1input.txt') as fp:
     nums = [int(x) for x in nums]
 
     # naive approach
+    found:bool = False
     for i in range(len(nums)):
         for j in range(len(nums)):
             for k in range(len(nums)):
                 if i == j or j == k or i == k:
                     break
-                if nums[i] + nums[j] + nums[k]== 2020:
+                if not found and sum([nums[i], nums[j], nums[k]])== 2020:
                     print (nums[i] * nums[j] * nums[k])
+                    found = True
